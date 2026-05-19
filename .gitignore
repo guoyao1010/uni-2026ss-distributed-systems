@@ -13,3 +13,6 @@ build
 
 # Ignore generated PDFs
 *.pdf
+
+# Ignore Intellij project files
+.idea/
