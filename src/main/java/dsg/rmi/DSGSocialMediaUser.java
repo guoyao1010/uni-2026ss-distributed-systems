@@ -14,10 +14,10 @@ public String bio;
 public List<Post> posts = new ArrayList<> ();
 public List <User> followedUser = new ArrayList <> ();
 
-public UserProfile (String userID, String Vorname, String Nachname, String bio) {
+public User (String userID, String Firstname, String Lastname, String bio) {
 this.userID = userID;
-this.Vorname= Vorname;
-this.Nachname = Nachname;
+this.Firstname= Firstname;
+this.Lastname = Lastname;
 this.bio = bio;
 
 }
