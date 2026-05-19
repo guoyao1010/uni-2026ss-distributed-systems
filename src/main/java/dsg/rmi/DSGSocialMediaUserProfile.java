@@ -8,8 +8,8 @@ public class User implements Serializable {
 
 private static final long serialVersionUID = 1L; 
 public String userID;
-public String Vorname;
-public String Nachname;
+public String Firstname;
+public String Lastname;
 public String bio;
 public List<Post> posts = new ArrayList<> ();
 public List <User> followedUser = new ArrayList <> ();
