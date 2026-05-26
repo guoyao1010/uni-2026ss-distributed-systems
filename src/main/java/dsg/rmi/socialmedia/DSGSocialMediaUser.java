@@ -1,20 +1,20 @@
-package dsg.rmi;
+package dsg.rmi.socialmedia;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User implements Serializable {
+public class DSGSocialMediaUser implements Serializable {
 
 private static final long serialVersionUID = 1L; 
 public String userID;
 public String Firstname;
 public String Lastname;
 public String bio;
-public List<Post> posts = new ArrayList<> ();
-public List <User> followedUser = new ArrayList <> ();
+public List<DSGSocialMediaPost> posts = new ArrayList<> ();
+public List <DSGSocialMediaUser> followedUsers = new ArrayList <> ();
 
-public User (String userID, String Firstname, String Lastname, String bio) {
+public DSGSocialMediaUser (String userID, String Firstname, String Lastname, String bio) {
 this.userID = userID;
 this.Firstname= Firstname;
 this.Lastname = Lastname;

@@ -1,4 +1,4 @@
-package dsg.rmi;
+package dsg.rmi.auction;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

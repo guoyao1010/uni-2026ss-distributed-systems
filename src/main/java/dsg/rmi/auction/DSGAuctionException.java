@@ -1,4 +1,4 @@
-package dsg.rmi;
+package dsg.rmi.auction;
 
 
 public class DSGAuctionException extends Exception {

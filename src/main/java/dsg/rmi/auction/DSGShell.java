@@ -1,4 +1,4 @@
-package dsg.rmi;
+package dsg.rmi.auction;
 
 import java.io.BufferedReader;
 import java.io.IOException;
