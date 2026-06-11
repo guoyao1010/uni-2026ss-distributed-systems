@@ -57,11 +57,11 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
 
     // Method publishPost by Yao and Osama
     @Override
-    public synchronized void publishPost (String userID, String Content) throws RemoteException{
+    public synchronized void publishPost (String userID, String content) throws RemoteException{
         DSGSocialMediaUser profile = profiles.get(userID) ;
         if (profile != null) {
             postCounter ++;
-            DSGSocialMediaPost newPost= new DSGSocialMediaPost(userID, Content);
+            DSGSocialMediaPost newPost= new DSGSocialMediaPost(userID, content);
             newPost.postID = "P" + postCounter;
             posts.put(newPost.postID, newPost);
         }
