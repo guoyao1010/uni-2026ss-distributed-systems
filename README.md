@@ -16,3 +16,35 @@ Resulting class files are located in the directory called `build/classes`,
 meaning you can run a JAVA class that implements the main method by adding the
 sub-directory `build/classes/java/main` to your classpath.
 
+# Run and test RMI framework on VMs
+This section describes the current proposed way to run the RMI part of the project on the assigned VMs.
+We could run server on 5129 VM and run client on 5140 VM.
+
+## 1. Connect to the VMs
+Open two terminal windows. 
+
+One for server and the other for client. Connect to the two VMs.
+
+## 2. Go to project folder and update the repository **on both VMs**
+Run following commands one by one **on both VMs**:
+```
+ls
+cd group-7
+git pull
+gradle build
+```
+
+## 3. Start the RMI server and RMI client
+**The server must be started before the client.**
+
+On 5129 VM (Server):
+```
+java -Djava.rmi.server.hostname=h5129.pi.uni-bamberg.de -cp build/classes/java/main dsg.rmi.socialmedia.DSGSocialMediaServer
+```
+On 5140 VM (Client):
+```
+java -cp build/classes/java/main dsg.rmi.socialmedia.DSGSocialMediaRMIClient
+```
+
+
+
