@@ -68,15 +68,22 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
     }
 
     // Method deletePost by Yao
-    public void deletePost (String postID) throws RemoteException {
+    @Override
+    public synchronized void deletePost (String userID, String postID) throws RemoteException {
         if (!posts.containsKey(postID)) {
             throw new RemoteException("This post does not exist.");
+        }
+
+        DSGSocialMediaPost post = posts.get(postID);
+        if (!post.userID.equals(userID)) {
+            throw new RemoteException("You can only delete your own post.");
         }
         posts.remove(postID);
     }
 
     // Method getFeed by Yao
-    public List<DSGSocialMediaPost> getFeed (String userID) throws RemoteException {
+    @Override
+    public synchronized List<DSGSocialMediaPost> getFeed (String userID) throws RemoteException {
         if (!profiles.containsKey(userID)) {
             throw new RemoteException("User does not exist: " + userID);
         }
@@ -94,7 +101,8 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
     }
 
     // Method followStudent by Yao
-    public void followStudent(String followerID, String targetID) throws RemoteException {
+    @Override
+    public synchronized void followStudent(String followerID, String targetID) throws RemoteException {
         if (!profiles.containsKey(followerID)) {
             throw new RemoteException("This ID does not exist: " + followerID);// or maybe create your own profile first
         }
@@ -114,7 +122,8 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
     }
 
     // Method unfollowStudent by Yao
-    public void unfollowStudent(String followerID, String targetID) throws RemoteException {
+    @Override
+    public synchronized void unfollowStudent(String followerID, String targetID) throws RemoteException {
         if (!profiles.containsKey(followerID)) {
             throw new RemoteException("Follower does not exist: " + followerID);
         }

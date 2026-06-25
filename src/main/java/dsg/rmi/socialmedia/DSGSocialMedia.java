@@ -11,7 +11,7 @@ public interface DSGSocialMedia extends Remote {
     void updateProfile (String userID, String firstname, String lastname, String bio) throws RemoteException;
     void publishPost (String userID, String content) throws RemoteException;
     DSGSocialMediaUser getProfile (String userID) throws RemoteException;
-    void deletePost (String postID) throws RemoteException;
+    void deletePost (String userID, String postID) throws RemoteException;
     List<DSGSocialMediaPost> getFeed (String userID) throws RemoteException;
     void followStudent(String followerID, String targetID) throws RemoteException;
     void unfollowStudent(String followerID, String targetID) throws RemoteException;
