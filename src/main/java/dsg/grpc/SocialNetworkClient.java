@@ -14,9 +14,10 @@ public class SocialNetworkClient {
         SocialNetworkServiceBlockingStub stub = SocialNetworkServiceGrpc.newBlockingStub(channel);
 
         CreateProfileRequest request = CreateProfileRequest.newBuilder()
-                .setUserId("user123")
-                .setName("Osama")
-                .setBio("Bamberg Student")
+                .setUserId("u1")
+                .setFirstname("Osama")
+                .setLastname("Student")
+                .setBio("Hello")
                 .build();
 
         stub.createProfile(request);

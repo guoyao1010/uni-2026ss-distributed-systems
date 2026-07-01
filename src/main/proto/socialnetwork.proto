@@ -1,61 +1,64 @@
 syntax = "proto3";
-
 option java_multiple_files = true;
 option java_package = "dsg.grpc";
 option java_outer_classname = "SocialNetworkProto";
 
 service SocialNetworkService {
-rpc CreateProfile (CreateProfileRequest) returns (EmptyResponse);
-rpc UpdateProfile (UpdateProfileRequest) returns (EmptyResponse);
-rpc GetProfile (GetProfileRequest) returns (GetProfileResponse);
-rpc PublishPost (PublishPostRequest) returns (EmptyResponse);
-rpc DeletePost (DeletePostRequest) returns (EmptyResponse);
-rpc FollowStudent (FollowStudentRequest) returns (EmptyResponse);
-rpc UnfollowStudent (UnfollowStudentRequest) returns (EmptyResponse);
-rpc GetFeed (GetFeedRequest) returns (GetFeedResponse);
+  rpc CreateProfile (CreateProfileRequest) returns (EmptyResponse);
+  rpc UpdateProfile (UpdateProfileRequest) returns (EmptyResponse);
+  rpc GetProfile (GetProfileRequest) returns (GetProfileResponse);
+  rpc PublishPost (PublishPostRequest) returns (EmptyResponse);
+  rpc DeletePost (DeletePostRequest) returns (EmptyResponse);
+  rpc FollowStudent (FollowStudentRequest) returns (EmptyResponse);
+  rpc UnfollowStudent (UnfollowStudentRequest) returns (EmptyResponse);
+  rpc GetFeed (GetFeedRequest) returns (GetFeedResponse);
 }
 
 message CreateProfileRequest {
-string user_id = 1;
-string name = 2;
-string bio = 3;
+  string user_id = 1;
+  string firstname = 2;
+  string lastname = 3;
+  string bio = 4;
 }
 message UpdateProfileRequest {
-string user_id = 1;
-string name = 2;
-string bio = 3;
+  string user_id = 1;
+  string firstname = 2;
+  string lastname = 3;
+  string bio = 4;
 }
 message GetProfileRequest {
-string user_id = 1;
+  string user_id = 1;
 }
 message GetProfileResponse {
-string name = 2;
-string bio =3;
+  string firstname = 1;
+  string lastname = 2;
+  string bio = 3;
 }
 message PublishPostRequest {
-string user_id = 1;
-string Content = 2;
+  string user_id = 1;
+  string content = 2;
 }
-message DeletePostRequest{
-string user_id = 1;
-int32 post_id= 2;
+message DeletePostRequest {
+  string user_id = 1;
+  string post_id = 2;
 }
 message FollowStudentRequest {
-string follower_id = 1;
-string target_id = 2;
+  string follower_id = 1;
+  string target_id = 2;
 }
 message UnfollowStudentRequest {
-string follower_id = 1;
-string target_id = 2;
-}
-message Post {
-int32 post_id = 1;
-string content = 2;
+  string follower_id = 1;
+  string target_id = 2;
 }
 message GetFeedRequest {
-string user_id = 1;
+  string user_id = 1;
 }
 message GetFeedResponse {
-repeated Post posts = 1;
+  repeated Post posts = 1;
+}
+message Post {
+  string post_id = 1;
+  string user_id = 2;
+  string content = 3;
 }
 message EmptyResponse {}
