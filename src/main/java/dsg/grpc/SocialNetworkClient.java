@@ -25,7 +25,7 @@ public class SocialNetworkClient extends DSGSocialMediaClient {
                 .usePlaintext()
                 .build();
         stub = SocialNetworkServiceGrpc.newBlockingStub(channel);
-        System.out.println("Connected to Social Media gRPC server.");
+        System.out.println("gRPC client initialized.");
     }
 
     @Override
@@ -120,7 +120,7 @@ public class SocialNetworkClient extends DSGSocialMediaClient {
 
     public static void main(String[] args) throws Exception {
         SocialNetworkClient client = new SocialNetworkClient();
-        client.init("localhost", 8080);
+        client.init("h5129.pi.uni-bamberg.de", 8080);
         client.shell();
         client.shutdown();
     }
