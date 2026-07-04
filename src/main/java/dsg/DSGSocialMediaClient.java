@@ -94,11 +94,11 @@ public abstract class DSGSocialMediaClient extends DSGShell {
 
         if (type.equals("rmi")) {
             client = new DSGSocialMediaRMIClient();
-            client.init("h5129.pi.uni-bamberg.de", 1099);
+            client.init("localhost", 1099);
             System.out.println("You are using the RMI client.");
         } else if (type.equals("grpc")) {
             client = new SocialNetworkClient();
-            client.init("h5129.pi.uni-bamberg.de", 8080);
+            client.init("localhost", 8080);
             System.out.println("You are using the gRPC client.");
         } else {
             System.out.println("Please run this file again and choose the client type first: rmi or grpc.");

@@ -64,7 +64,7 @@ gradle -q runSocialMediaClient
 ```
 When the client asks for the client type, please enter `grpc`.
 
-## Available commands for both RMI and gRPC version
+## 5. Available commands for both RMI and gRPC version
 ```
 createprofile <userId> <firstname> <lastname> <bio>
 getprofile <userId>
@@ -76,5 +76,27 @@ unfollowstudent <followerId> <targetId>
 getfeed <userId>
 exit
 ```
+
+## 6. Run the Benchmark client for evaluation
+### Run the RMI benchmark
+Start the RMI server on the server VM:
+```
+gradle -q runRmiServer
+```
+Start the benchmark client in rmi version on the client VM:
+```
+gradle -q runBenchmark --args="rmi"
+```
+### Run the gRPC benchmark
+Start the gRPC server on the server VM:
+```aiignore
+gradle -q runGrpcServer
+```
+Start the benchmark client in gRPC version on client VM:
+```aiignore
+gradle -q runBenchmark --args="grpc"
+```
+
+
 
 

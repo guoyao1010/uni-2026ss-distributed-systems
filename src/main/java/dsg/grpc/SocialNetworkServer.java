@@ -11,7 +11,7 @@ public class SocialNetworkServer {
                 .build();
 
         server.start();
-        System.out.println("gRPC Server connected...");
+        System.out.println("gRPC Server is running...");
         server.awaitTermination();
     }
 }

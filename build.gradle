@@ -52,7 +52,7 @@ protobuf {
 tasks.register('runRmiServer', JavaExec) {
     classpath = project.sourceSets.main.runtimeClasspath
     mainClass = 'dsg.rmi.socialmedia.DSGSocialMediaServer'
-    systemProperty 'java.rmi.server.hostname', 'h5129.pi.uni-bamberg.de'
+    systemProperty 'java.rmi.server.hostname', project.findProperty('rmiHost') ?: 'localhost'
 }
 
 // Run the gRPC server
@@ -66,4 +66,10 @@ tasks.register('runSocialMediaClient', JavaExec) {
     classpath = project.sourceSets.main.runtimeClasspath
     mainClass = 'dsg.DSGSocialMediaClient'
     standardInput = System.in
+}
+
+// Run the benchmark client
+tasks.register('runBenchmark', JavaExec) {
+    classpath = project.sourceSets.main.runtimeClasspath
+    mainClass = 'dsg.DSGSocialMediaBenchmarkClient'
 }

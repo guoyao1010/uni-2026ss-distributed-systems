@@ -22,7 +22,13 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
 
     @Override
     public void createProfile(CreateProfileRequest request, StreamObserver<EmptyResponse> responseObserver) {
-        profiles.put(request.getUserId(), new ProfileData(request.getFirstname(),request.getLastname(), request.getBio()));
+        if (!profiles.containsKey(request.getUserId())) {
+            profiles.put(request.getUserId(), new ProfileData(
+                    request.getFirstname(),
+                    request.getLastname(),
+                    request.getBio()
+            ));
+        }
         userPosts.putIfAbsent(request.getUserId(), new CopyOnWriteArrayList<>());
         following.putIfAbsent(request.getUserId(), ConcurrentHashMap.newKeySet());
 
