@@ -65,3 +65,10 @@ tasks.register('runGrpcClient', JavaExec) {
     mainClass = 'dsg.grpc.SocialNetworkClient'
     standardInput = System.in
 }
+
+// For testing the shared entry point of both RMI and gRPC
+tasks.register('runSocialMediaClient', JavaExec) {
+    classpath = project.sourceSets.main.runtimeClasspath
+    mainClass = 'dsg.DSGSocialMediaClient'
+    standardInput = System.in
+}
