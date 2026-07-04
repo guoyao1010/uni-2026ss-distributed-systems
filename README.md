@@ -42,27 +42,27 @@ gradle clean build
 ### Server side: h5129 VM
 Start the RMI server with following command and keep this terminal running:
 ```
-java -Djava.rmi.server.hostname=h5129.pi.uni-bamberg.de -cp build/classes/java/main dsg.rmi.socialmedia.DSGSocialMediaServer
+gradle -q runRmiServer
 ```
 ### Client side: h5140 VM
-Start the abstract social media client with following command and test in this terminal:
+Start the abstract social media client with following command and test rmi version in this terminal:
 ```
-java -cp build/classes/java/main dsg.DSGSocialMediaClient
+gradle -q runSocialMediaClient
 ```
-When the client asks for the client type, please type in "rmi".
+When the client asks for the client type, please type in `rmi`.
 
 ## 4. Run gRPC version
 ### Server side: h5129 VM
 Start the gRPC server with following command and keep this terminal running.
 ```
-java -cp "$(gradle -q printRuntimeClasspath)" dsg.grpc.SocialNetworkServer
+gradle -q runGrpcServer
 ```
 ### Client side: h5140 VM
 Start the shared abstract client with following command and test in this terminal.
 ```
-java -cp "$(gradle -q printRuntimeClasspath)" dsg.DSGSocialMediaClient
+gradle -q runSocialMediaClient
 ```
-When the client asks for the client type, please enter "grpc".
+When the client asks for the client type, please enter `grpc`.
 
 ## Available commands for both RMI and gRPC version
 ```

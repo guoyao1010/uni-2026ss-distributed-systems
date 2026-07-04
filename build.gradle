@@ -48,25 +48,20 @@ protobuf {
     }
 }
 
-// For run the gRPC server and client with shorter commands
-tasks.register('printRuntimeClasspath') {
-    doLast {
-        println project.sourceSets.main.runtimeClasspath.asPath
-    }
+// Run the RMI server
+tasks.register('runRmiServer', JavaExec) {
+    classpath = project.sourceSets.main.runtimeClasspath
+    mainClass = 'dsg.rmi.socialmedia.DSGSocialMediaServer'
+    systemProperty 'java.rmi.server.hostname', 'h5129.pi.uni-bamberg.de'
 }
 
+// Run the gRPC server
 tasks.register('runGrpcServer', JavaExec) {
     classpath = project.sourceSets.main.runtimeClasspath
     mainClass = 'dsg.grpc.SocialNetworkServer'
 }
 
-tasks.register('runGrpcClient', JavaExec) {
-    classpath = project.sourceSets.main.runtimeClasspath
-    mainClass = 'dsg.grpc.SocialNetworkClient'
-    standardInput = System.in
-}
-
-// For testing the shared entry point of both RMI and gRPC
+// Run the shared client for both RMI and gRPC
 tasks.register('runSocialMediaClient', JavaExec) {
     classpath = project.sourceSets.main.runtimeClasspath
     mainClass = 'dsg.DSGSocialMediaClient'
