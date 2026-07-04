@@ -41,7 +41,7 @@ message PublishPostRequest {
 }
 message DeletePostRequest{
   string user_id = 1;
-  int32 post_id= 2;
+  string post_id= 2;
 }
 message FollowStudentRequest {
   string follower_id = 1;
@@ -52,7 +52,7 @@ message UnfollowStudentRequest {
   string target_id = 2;
 }
 message Post {
-  int32 post_id = 1;
+  string post_id = 1;
   string content = 2;
 }
 message GetFeedRequest {

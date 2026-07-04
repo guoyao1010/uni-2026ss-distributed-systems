@@ -4,77 +4,124 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import dsg.grpc.SocialNetworkServiceGrpc.SocialNetworkServiceBlockingStub;
 import dsg.grpc.SocialNetworkProto.*;
+import dsg.DSGSocialMediaClient;
+import java.util.List;
+import java.util.ArrayList;
 
-public class SocialNetworkClient {
+public class SocialNetworkClient extends DSGSocialMediaClient {
 
-    private final ManagedChannel channel;
-    private final SocialNetworkServiceBlockingStub stub;
+    private ManagedChannel channel;
+    private SocialNetworkServiceBlockingStub stub;
 
-    public SocialNetworkClient(String host, int port) {
-        this.channel = ManagedChannelBuilder.forAddress(host, port)
+    public SocialNetworkClient( ) { }
+
+    // #############################
+    // # INITIALIZATION & SHUTDOWN #
+    // #############################
+
+    @Override
+    public void init (String host, int port) {
+        channel = ManagedChannelBuilder.forAddress(host, port)
                 .usePlaintext()
                 .build();
-        this.stub = SocialNetworkServiceGrpc.newBlockingStub(channel);
+        stub = SocialNetworkServiceGrpc.newBlockingStub(channel);
+        System.out.println("Connected to Social Media gRPC server.");
     }
 
-    public void createProfile(String userId, String firstname, String lastname, String bio) {
-        stub.createProfile(CreateProfileRequest.newBuilder()
-                .setUserId(userId)
-                .setFirstname(firstname)
-                .setLastname(lastname)
-                .setBio(bio)
-                .build());
-    }
-
-    public void getProfile (String userId){
-        stub.getProfile(GetProfileRequest.newBuilder()
-                .setUserId(userId)
-                .build());
-    }
-    public void updateProfile (String userId, String firstname, String lastname, String bio) {
-        stub.updateProfile(UpdateProfileRequest.newBuilder()
-                .setUserId(userId)
-                .setFirstname(firstname)
-                .setLastname(lastname)
-                .setBio(bio)
-                .build());
-    }
-    public void publishPost (String userId, String content){
-        stub.publishPost(PublishPostRequest.newBuilder()
-                .setUserId(userId)
-                .setContent(content)
-                .build());
-    }
-    public void deletePost (String userId, int postId){
-        stub.deletePost(DeletePostRequest.newBuilder()
-                .setUserId(userId)
-                .setPostId(postId)
-                .build());
-    }
-    public void followStudent (String followerId, String targetId){
-        stub.followStudent(FollowStudentRequest.newBuilder()
-                .setFollowerId(followerId)
-                .setTargetId(targetId)
-                .build());
-    }
-    public void unfollowStudent (String followerId, String targetId){
-        stub.unfollowStudent(UnfollowStudentRequest.newBuilder()
-                .setFollowerId(followerId)
-                .setTargetId(targetId)
-                .build());
-    }
-    public GetFeedResponse getFeed(String userId) {
-        return stub.getFeed(GetFeedRequest.newBuilder()
-                .setUserId(userId)
-                .build());
-    }
-
-    public void shutdown() {
+    @Override
+    public void shutdown () {
         channel.shutdown();
+        System.out.println("gRPC client shutdown.");
     }
 
-    public static void main(String[] args) {
-        SocialNetworkClient client = new SocialNetworkClient("localhost", 8080);
+    @Override
+    protected void createProfile (String userID, String firstname, String lastname, String bio) {
+        CreateProfileRequest request = CreateProfileRequest.newBuilder()
+                .setUserId(userID)
+                .setFirstname(firstname)
+                .setLastname(lastname)
+                .setBio(bio)
+                .build();
+        stub.createProfile(request);
+    }
+
+    @Override
+    protected String getProfile (String userID) {
+        GetProfileRequest request = GetProfileRequest.newBuilder()
+                .setUserId(userID)
+                .build();
+        GetProfileResponse response = stub.getProfile(request);
+        return response.getFirstname() + " " + response.getLastname() + " " + response.getBio();
+    }
+
+    @Override
+    protected void updateProfile (String userID, String firstname, String lastname, String bio) {
+        UpdateProfileRequest request = UpdateProfileRequest.newBuilder()
+                .setUserId(userID)
+                .setFirstname(firstname)
+                .setLastname(lastname)
+                .setBio(bio)
+                .build();
+        stub.updateProfile(request);
+    }
+
+    @Override
+    protected void publishPost (String userID, String content) {
+        PublishPostRequest request = PublishPostRequest.newBuilder()
+                .setUserId(userID)
+                .setContent(content)
+                .build();
+        stub.publishPost(request);
+    }
+
+    @Override
+    protected void deletePost (String userID, String postID) {
+        DeletePostRequest request =DeletePostRequest.newBuilder()
+                .setUserId(userID)
+                .setPostId(postID)
+                .build();
+        stub.deletePost(request);
+    }
+
+    @Override
+    protected void followStudent (String followerID, String targetID) {
+        FollowStudentRequest request = FollowStudentRequest.newBuilder()
+                .setFollowerId(followerID)
+                .setTargetId(targetID)
+                .build();
+        stub.followStudent(request);
+    }
+
+    @Override
+    protected void unfollowStudent (String followerID, String targetID) {
+        UnfollowStudentRequest request = UnfollowStudentRequest.newBuilder()
+                .setFollowerId(followerID)
+                .setTargetId(targetID)
+                .build();
+        stub.unfollowStudent(request);
+    }
+
+    @Override
+    protected List<String> getFeed (String userID) {
+        GetFeedRequest request = GetFeedRequest.newBuilder()
+                .setUserId(userID)
+                .build();
+        GetFeedResponse response = stub.getFeed(request);
+        List<String> feed = new ArrayList<>();
+        for (Post post: response.getPostsList()) {
+            feed.add(post.getPostId() + " " + post.getContent());
+        }
+        return feed;
+    }
+
+    // ########
+    // # MAIN #
+    // ########
+
+    public static void main(String[] args) throws Exception {
+        SocialNetworkClient client = new SocialNetworkClient();
+        client.init("localhost", 8080);
+        client.shell();
         client.shutdown();
     }
 }

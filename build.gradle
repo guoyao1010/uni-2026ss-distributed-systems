@@ -29,6 +29,7 @@ dependencies {
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
 }
 
+// For fixing the gradle build issue when running the gRPC version.
 protobuf {
     protoc {
         artifact = 'com.google.protobuf:protoc:3.25.5'
@@ -44,5 +45,12 @@ protobuf {
         all()*.plugins {
             grpc {}
         }
+    }
+}
+
+// For run the gRPC server and client with shorter commands
+tasks.register('printRuntimeClasspath') {
+    doLast {
+        println sourceSets.main.runtimeClasspath.asPath
     }
 }

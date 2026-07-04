@@ -55,7 +55,7 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
         List<Post> posts = userPosts.get(request.getUserId());
         if (posts != null) {
             Post newPost = Post.newBuilder()
-                    .setPostId(postIdCounter.getAndIncrement())
+                    .setPostId(String.valueOf(postIdCounter.getAndIncrement()))
                     .setContent(request.getContent())
                     .build();
             posts.add(0, newPost);
@@ -68,7 +68,7 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
     public void deletePost(DeletePostRequest request, StreamObserver<EmptyResponse> responseObserver) {
         List<Post> posts = userPosts.get(request.getUserId());
         if (posts != null) {
-            posts.removeIf(post -> post.getPostId() == request.getPostId());
+            posts.removeIf(post -> String.valueOf(post.getPostId()).equals(request.getPostId()));
         }
         responseObserver.onNext(EmptyResponse.newBuilder().build());
         responseObserver.onCompleted();
@@ -107,7 +107,7 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
                     feedPosts.addAll(posts);
                 }
             }
-            feedPosts.sort((p1, p2) -> Integer.compare(p2.getPostId(), p1.getPostId()));
+            feedPosts.sort((p1, p2) -> Integer.compare(Integer.parseInt(p2.getPostId()), Integer.parseInt(p1.getPostId())));
             response.addAllPosts(feedPosts);
         }
 

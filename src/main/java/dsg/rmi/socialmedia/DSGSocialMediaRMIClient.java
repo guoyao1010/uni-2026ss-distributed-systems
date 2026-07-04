@@ -3,8 +3,10 @@ package dsg.rmi.socialmedia;
 import  java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.List;
+import java.util.ArrayList;
+import dsg.DSGSocialMediaClient;
 
-public class DSGSocialMediaRMIClient extends DSGShell{
+public class DSGSocialMediaRMIClient extends DSGSocialMediaClient{
 
     private DSGSocialMedia socialMedia;
 
@@ -21,82 +23,55 @@ public class DSGSocialMediaRMIClient extends DSGShell{
         System.out.println("Connected to Social Media RMI server.");
     }
 
-
     public void shutdown() {
-        System.out.println("Client shutdown.");
+        System.out.println("RMIClient shutdown.");
     }
-
-
-    // ##################
-    // # CLIENT METHODS #
-    // ##################
-
-
-
-    // #########
-    // # SHELL #
-    // #########
 
     @Override
-    protected boolean processCommand(String[] args) {
-
-        try {
-            if (args[0].equals("createprofile")) {
-                socialMedia.createProfile(args[1], args[2], args[3], args[4]);
-                System.out.println("Profile created.");
-            }
-
-            if (args[0].equals("getprofile")) {
-                DSGSocialMediaUser user = socialMedia.getProfile(args[1]);
-                System.out.println(user.firstname+ " " +user.lastname + " " + user.bio);
-            }
-
-            if (args[0].equals("updateprofile")) {
-                socialMedia.updateProfile(args[1], args[2], args[3], args[4]);
-                System.out.println("Profile updated.");
-            }
-
-            if (args[0].equals("publishpost")) {
-                socialMedia.publishPost(args[1], args[2]);
-                System.out.println("Post published.");
-            }
-
-            if (args[0].equals("deletepost")) {
-                socialMedia.deletePost(args[1], args[2]);
-                System.out.println("Post deleted.");
-            }
-
-            if (args[0].equals("getfeed")) {
-                List<DSGSocialMediaPost> feed = socialMedia.getFeed(args[1]);
-
-                if (feed.isEmpty()) {
-                    System.out.println("Students you are following did not publish anything yet.");
-                }
-
-                for (DSGSocialMediaPost post : feed) {
-                    System.out.println(post.userID + " " + post.postID + " " + post.content);
-                }
-            }
-
-            if (args[0].equals("followstudent")) {
-                socialMedia.followStudent(args[1], args[2]);
-                System.out.println("Student followed.");
-            }
-
-            if (args[0].equals("unfollowstudent")) {
-                socialMedia.unfollowStudent(args[1], args[2]);
-                System.out.println("Student unfollowed.");
-            }
-
-            if (args[0].equals("exit")) {
-                return false;
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return true;
+    protected void createProfile (String userID, String firstname, String lastname, String bio) throws Exception {
+        socialMedia.createProfile(userID, firstname, lastname, bio);
     }
 
+    @Override
+    protected String getProfile (String userID) throws Exception {
+        DSGSocialMediaUser user = socialMedia.getProfile(userID);
+        return user.firstname + " " + user.lastname + " " + user.bio;
+    }
+
+    @Override
+    protected void updateProfile (String userID, String firstname, String lastname, String bio) throws Exception {
+        socialMedia.updateProfile(userID, firstname, lastname, bio);
+    }
+
+    @Override
+    protected void publishPost (String userID, String content) throws Exception {
+        socialMedia.publishPost(userID, content);
+    }
+
+    @Override
+    protected void deletePost (String userID, String postID) throws Exception {
+        socialMedia.deletePost(userID, postID);
+    }
+
+    @Override
+    protected void followStudent (String followerID, String targetID) throws Exception {
+        socialMedia.followStudent(followerID, targetID);
+    }
+
+    @Override
+    protected void unfollowStudent (String followerID, String targetId) throws Exception {
+        socialMedia.unfollowStudent(followerID, targetId);
+    }
+
+    @Override
+    protected List<String> getFeed (String userID) throws Exception {
+        List<DSGSocialMediaPost> posts = socialMedia.getFeed(userID);
+        List<String> feed = new ArrayList<>();
+        for (DSGSocialMediaPost post : posts) {
+            feed.add(post.userID + " " +post.postID + " " + post.content);
+        }
+        return feed;
+    }
 
     // ########
     // # MAIN #
@@ -104,7 +79,7 @@ public class DSGSocialMediaRMIClient extends DSGShell{
 
     public static void main(String[] args) throws Exception {
         DSGSocialMediaRMIClient client = new DSGSocialMediaRMIClient();
-        client.init("h5129.pi.uni-bamberg.de", 1099);
+        client.init("localhost", 1099);
         client.shell();
         client.shutdown();
     }
