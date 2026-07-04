@@ -51,6 +51,17 @@ protobuf {
 // For run the gRPC server and client with shorter commands
 tasks.register('printRuntimeClasspath') {
     doLast {
-        println sourceSets.main.runtimeClasspath.asPath
+        println project.sourceSets.main.runtimeClasspath.asPath
     }
+}
+
+tasks.register('runGrpcServer', JavaExec) {
+    classpath = project.sourceSets.main.runtimeClasspath
+    mainClass = 'dsg.grpc.SocialNetworkServer'
+}
+
+tasks.register('runGrpcClient', JavaExec) {
+    classpath = project.sourceSets.main.runtimeClasspath
+    mainClass = 'dsg.grpc.SocialNetworkClient'
+    standardInput = System.in
 }
