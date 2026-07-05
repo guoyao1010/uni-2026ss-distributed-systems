@@ -83,7 +83,7 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
     @Override
     public void followStudent(FollowStudentRequest request, StreamObserver<EmptyResponse> responseObserver) {
         Set<String> f = following.get(request.getFollowerId());
-        if (f != null && profiles.containsKey(request.getTargetId())) {
+        if (f != null && profiles.containsKey(request.getTargetId()) && !request.getFollowerId().equals(request.getTargetId())) {
             f.add(request.getTargetId());
         }
         responseObserver.onNext(EmptyResponse.newBuilder().build());
@@ -92,9 +92,11 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
 
     @Override
     public void unfollowStudent(UnfollowStudentRequest request, StreamObserver<EmptyResponse> responseObserver) {
-        Set<String> f = following.get(request.getFollowerId());
-        if (f != null) {
-            f.remove(request.getTargetId());
+        if (profiles.containsKey(request.getFollowerId()) && profiles.containsKey(request.getTargetId())) {
+            Set<String> f = following.get(request.getFollowerId());
+            if (f != null && f.contains(request.getTargetId())) {
+                f.remove(request.getTargetId());
+            }
         }
         responseObserver.onNext(EmptyResponse.newBuilder().build());
         responseObserver.onCompleted();

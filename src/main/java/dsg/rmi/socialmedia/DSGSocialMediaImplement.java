@@ -11,12 +11,8 @@ import java.util.Set;
 
 public class DSGSocialMediaImplement implements DSGSocialMedia {
 
-    // In-memory database:
-    // profiles stores all user profiles
     private final Map<String, DSGSocialMediaUser> profiles = new HashMap<>();
-    // posts stores all published posts
     private final Map<String, DSGSocialMediaPost> posts = new HashMap<>();
-    // following stores who follows whom
     private final Map<String, Set<String>> following = new HashMap<>();
 	private int postCounter = 0;
 
@@ -39,13 +35,9 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
     public synchronized void updateProfile(String userID, String firstname, String lastname, String bio) throws RemoteException {
         DSGSocialMediaUser profile = profiles.get(userID);
         if (profile != null) {
-            if ( bio != null){
-                profile.bio = bio;}
-            if(firstname != null){
-                profile.firstname = firstname;}
-            if (lastname != null) {
-                profile.lastname = lastname;}
-
+            profile.firstname = firstname;
+            profile.lastname = lastname;
+            profile.bio = bio;
         }
     }
 
@@ -62,7 +54,7 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
         if (profile != null) {
             postCounter ++;
             DSGSocialMediaPost newPost= new DSGSocialMediaPost(userID, content);
-            newPost.postID = "P" + postCounter;
+            newPost.postID = String.valueOf(postCounter);
             posts.put(newPost.postID, newPost);
         }
     }
@@ -81,25 +73,6 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
         posts.remove(postID);
     }
 
-    // Method getFeed by Yao
-    @Override
-    public synchronized List<DSGSocialMediaPost> getFeed (String userID) throws RemoteException {
-        if (!profiles.containsKey(userID)) {
-            throw new RemoteException("User does not exist: " + userID);
-        }
-        List<DSGSocialMediaPost> feed = new ArrayList<>(); //create an empty list for the feed
-        Set<String> followedStudents = following.get(userID); //get all the users set that current userID follows
-        if (followedStudents == null) {
-            return feed;  //feed is empty
-        }
-        for (DSGSocialMediaPost post : posts.values()) {
-            if (followedStudents.contains(post.userID)) {
-                feed.add(post);
-            }
-        }
-        return feed;
-    }
-
     // Method followStudent by Yao
     @Override
     public synchronized void followStudent(String followerID, String targetID) throws RemoteException {
@@ -112,12 +85,8 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
         if (followerID.equals(targetID)) {
             throw new RemoteException("Sorry, you cannot follow yourself.");
         }
-        // create an empty following set, if the user hasn't followed anyone
         following.putIfAbsent(followerID, new HashSet<>());
-
-        // followedStudents stores the set of all followed students
         Set<String> followedStudents = following.get(followerID);
-
         followedStudents.add(targetID);
     }
 
@@ -141,6 +110,26 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
         }
 
         followedStudents.remove(targetID);
+    }
+
+    // Method getFeed by Yao
+    @Override
+    public synchronized List<DSGSocialMediaPost> getFeed (String userID) throws RemoteException {
+        if (!profiles.containsKey(userID)) {
+            throw new RemoteException("User does not exist: " + userID);
+        }
+        List<DSGSocialMediaPost> feed = new ArrayList<>();
+        Set<String> followedStudents = following.get(userID);
+        if (followedStudents == null) {
+            return feed;
+        }
+        for (DSGSocialMediaPost post : posts.values()) {
+            if (followedStudents.contains(post.userID)) {
+                feed.add(post);
+            }
+        }
+        feed.sort((post1, post2) -> Integer.compare(Integer.parseInt(post2.postID), Integer.parseInt(post1.postID)));
+        return feed;
     }
 
 }
