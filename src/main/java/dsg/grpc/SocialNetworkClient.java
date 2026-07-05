@@ -114,6 +114,19 @@ public class SocialNetworkClient extends DSGSocialMediaClient {
         return feed;
     }
 
+    @Override
+    protected List<String> getPosts (String userID) {
+        GetPostsRequest request = GetPostsRequest.newBuilder()
+                .setUserId(userID)
+                .build();
+        GetPostsResponse response = stub.getPosts(request);
+        List<String> postsresult = new ArrayList<>();
+        for (Post post: response.getPostsList()) {
+            postsresult.add(post.getPostId() + " " + post.getContent());
+        }
+        return postsresult;
+    }
+
     // ########
     // # MAIN #
     // ########

@@ -3,6 +3,7 @@ package dsg;
 import dsg.rmi.socialmedia.DSGShell;
 import java.util.List;
 
+import dsg.rmi.socialmedia.DSGSocialMediaPost;
 import dsg.rmi.socialmedia.DSGSocialMediaRMIClient;
 import dsg.grpc.SocialNetworkClient;
 
@@ -21,6 +22,7 @@ public abstract class DSGSocialMediaClient extends DSGShell {
     protected abstract void followStudent (String followerID, String targetID) throws Exception;
     protected abstract void unfollowStudent (String followerID, String targetID) throws Exception;
     protected abstract List<String> getFeed (String userID) throws Exception;
+    protected abstract List<String> getPosts (String userID) throws Exception;
 
     @Override
     protected boolean processCommand (String[] args) {
@@ -66,6 +68,16 @@ public abstract class DSGSocialMediaClient extends DSGShell {
                     System.out.println("Student you are following did not publish anythin yet.");
                 }
                 for (String post: feed) {
+                    System.out.println(post);
+                }
+            }
+
+            if (args[0].equals("getposts")) {
+                List<String> userposts = getPosts(args[1]);
+                if (userposts.isEmpty()) {
+                    System.out.println("You did not publish any post yet.");
+                }
+                for (String post: userposts) {
                     System.out.println(post);
                 }
             }

@@ -13,6 +13,7 @@ service SocialNetworkService {
   rpc FollowStudent (FollowStudentRequest) returns (EmptyResponse);
   rpc UnfollowStudent (UnfollowStudentRequest) returns (EmptyResponse);
   rpc GetFeed (GetFeedRequest) returns (GetFeedResponse);
+  rpc GetPosts (GetPostsRequest) returns (GetPostsResponse);
 }
 
 message CreateProfileRequest {
@@ -59,6 +60,12 @@ message GetFeedRequest {
   string user_id = 1;
 }
 message GetFeedResponse {
+  repeated Post posts = 1;
+}
+message GetPostsRequest {
+  string user_id = 1;
+}
+message GetPostsResponse {
   repeated Post posts = 1;
 }
 message EmptyResponse {}

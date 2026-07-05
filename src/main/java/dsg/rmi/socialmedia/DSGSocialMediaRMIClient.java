@@ -73,6 +73,16 @@ public class DSGSocialMediaRMIClient extends DSGSocialMediaClient{
         return feed;
     }
 
+    @Override
+    protected List<String> getPosts (String userID) throws Exception {
+        List<DSGSocialMediaPost> posts = socialMedia.getPosts(userID);
+        List<String> postsresult = new ArrayList<>();
+        for (DSGSocialMediaPost post: posts) {
+            postsresult.add(post.postID + " " +post.content);
+        }
+        return postsresult;
+    }
+
     // ########
     // # MAIN #
     // ########

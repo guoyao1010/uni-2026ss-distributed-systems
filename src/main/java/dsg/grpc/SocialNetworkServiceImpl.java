@@ -122,4 +122,17 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
         responseObserver.onNext(response.build());
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void getPosts (GetPostsRequest request, StreamObserver<GetPostsResponse> responseObserver) {
+        GetPostsResponse.Builder response = GetPostsResponse.newBuilder();
+        List<Post> posts = userPosts.get(request.getUserId());
+        if (posts != null) {
+            List<Post> postsresult = new ArrayList<>(posts);
+            postsresult.sort((post1, post2) -> Integer.compare(Integer.parseInt(post2.getPostId()), Integer.parseInt(post1.getPostId())));
+            response.addAllPosts(postsresult);
+        }
+        responseObserver.onNext(response.build());
+        responseObserver.onCompleted();
+    }
 }

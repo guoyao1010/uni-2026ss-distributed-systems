@@ -132,4 +132,19 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
         return feed;
     }
 
+    // Method getPosts by Yao
+    @Override
+    public synchronized List<DSGSocialMediaPost> getPosts (String userID) throws RemoteException {
+        if (!profiles.containsKey(userID)) {
+            throw new RemoteException("User does not exist.");
+        }
+        List<DSGSocialMediaPost> userPosts = new ArrayList<>();
+        for (DSGSocialMediaPost post : posts.values()) {
+            if (post.userID.equals(userID)) {
+                userPosts.add(post);
+            }
+        }
+        userPosts.sort((post1, post2) -> Integer.compare(Integer.parseInt(post2.postID), Integer.parseInt(post1.postID)));
+        return userPosts;
+    }
 }

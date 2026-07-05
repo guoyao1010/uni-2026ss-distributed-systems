@@ -42,12 +42,12 @@ gradle clean build
 ### Server side: h5129 VM
 Start the RMI server with following command and keep this terminal running:
 ```
-gradle -q runRmiServer
+gradle -q runRmiServer --console=plain
 ```
 ### Client side: h5140 VM
 Start the abstract social media client with following command and test rmi version in this terminal:
 ```
-gradle -q runSocialMediaClient
+gradle -q runSocialMediaClient --console=plain
 ```
 When the client asks for the client type, please type in `rmi`.
 
@@ -55,25 +55,26 @@ When the client asks for the client type, please type in `rmi`.
 ### Server side: h5129 VM
 Start the gRPC server with following command and keep this terminal running.
 ```
-gradle -q runGrpcServer
+gradle -q runGrpcServer --console=plain
 ```
 ### Client side: h5140 VM
 Start the shared abstract client with following command and test in this terminal.
 ```
-gradle -q runSocialMediaClient
+gradle -q runSocialMediaClient --console=plain
 ```
 When the client asks for the client type, please enter `grpc`.
 
 ## 5. Available commands for both RMI and gRPC version
 ```
-createprofile <userId> <firstname> <lastname> <bio>
-getprofile <userId>
-updateprofile <userId> <firstname> <lastname> <bio>
-publishpost <userId> <content>
-deletepost <userId> <postId>
-followstudent <followerId> <targetId>
-unfollowstudent <followerId> <targetId>
-getfeed <userId>
+createprofile <userID> <firstname> <lastname> <bio>
+getprofile <userID>
+updateprofile<userID> <firstname> <lastname> <bio>
+publishpost <userID> <content>
+deletepost <userID> <postId>
+followstudent <followerID> <targetID>
+unfollowstudent <followerID> <targetID>
+getfeed <userID>
+getposts<userID>
 exit
 ```
 
@@ -81,20 +82,20 @@ exit
 ### Run the RMI benchmark
 Start the RMI server on the server VM:
 ```
-gradle -q runRmiServer
+gradle -q runRmiServer --console=plain
 ```
 Start the benchmark client in rmi version on the client VM:
 ```
-gradle -q runBenchmark --args="rmi"
+gradle -q runBenchmark --args="rmi" --console=plain
 ```
 ### Run the gRPC benchmark
 Start the gRPC server on the server VM:
-```aiignore
-gradle -q runGrpcServer
+```
+gradle -q runGrpcServer --console=plain
 ```
 Start the benchmark client in gRPC version on client VM:
-```aiignore
-gradle -q runBenchmark --args="grpc"
+```
+gradle -q runBenchmark --args="grpc" --console=plain
 ```
 
 
