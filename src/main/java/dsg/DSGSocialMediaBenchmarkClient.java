@@ -40,10 +40,12 @@ public class DSGSocialMediaBenchmarkClient {
         measureGetProfile(client, userID, args[0]);
         measureUpdateProfile(client, userID, args[0]);
         measurePublishPost(client, userID, args[0]);
-
-        client.publishPost(userID, "For getposts");
-        measureGetPosts(client, userID, args[0]);
         measureDeletePost(client, userID, args[0]);
+
+        String getpostuserID = "003" + System.currentTimeMillis();
+        client.createProfile(getpostuserID, "Celine", "Musterfrau", "For getposts");
+        client.publishPost(getpostuserID, "For getposts");
+        measureGetPosts(client, getpostuserID, args[0]);
 
         measureFollowStudent(client, userID, targetID, args[0]);
         measureUnfollowStudent(client, userID, targetID, args[0]);
