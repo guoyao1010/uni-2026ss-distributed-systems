@@ -89,7 +89,7 @@ public class DSGSocialMediaRMIClient extends DSGSocialMediaClient{
 
     public static void main(String[] args) throws Exception {
         DSGSocialMediaRMIClient client = new DSGSocialMediaRMIClient();
-        client.init("localhost", 1099);
+        client.init(args[0], 1099);
         client.shell();
         client.shutdown();
     }

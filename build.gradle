@@ -52,7 +52,7 @@ protobuf {
 tasks.register('runRmiServer', JavaExec) {
     classpath = project.sourceSets.main.runtimeClasspath
     mainClass = 'dsg.rmi.socialmedia.DSGSocialMediaServer'
-    systemProperty 'java.rmi.server.hostname', project.findProperty('rmiHost') ?: 'localhost'
+    systemProperty 'java.rmi.server.hostname', project.findProperty('rmiHost') ?: 'h5129.pi.uni-bamberg.de'
 }
 
 // Run the gRPC server

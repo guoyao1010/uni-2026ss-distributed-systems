@@ -133,7 +133,7 @@ public class SocialNetworkClient extends DSGSocialMediaClient {
 
     public static void main(String[] args) throws Exception {
         SocialNetworkClient client = new SocialNetworkClient();
-        client.init("localhost", 8080);
+        client.init(args[0], 8080);
         client.shell();
         client.shutdown();
     }

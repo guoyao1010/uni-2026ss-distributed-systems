@@ -11,22 +11,24 @@ public class DSGSocialMediaBenchmarkClient {
     private static final int RUNS = 10000;
 
     public static void main(String[] args) throws Exception{
-        DSGSocialMediaClient client;
-        if (args.length == 0) {
-            System.out.println("Choose client type: rmi or grpc.");
+        if (args.length < 2) {
+            System.out.println("Please run the benchmark again using commands with two parameters: <rmi|grpc> <hostname>.");
             return;
         }
+        String type = args[0];
+        String host = args[1];
+        DSGSocialMediaClient client;
 
-        if (args[0].equals("rmi")) {
+        if (type.equals("rmi")) {
             client = new DSGSocialMediaRMIClient();
-            client.init("localhost", 1099);
+            client.init(host,1099);
             System.out.println("Benchmark is using the RMI.");
-        } else if (args[0].equals("grpc")) {
+        } else if (type.equals("grpc")) {
             client = new SocialNetworkClient();
-            client.init("localhost", 8080);
+            client.init(host, 8080);
             System.out.println("Benchmark is using the gRPC.");
         } else {
-            System.out.println("Please choose the client type first: rmi or grpc.");
+            System.out.println("Please choose the client type in command: rmi or grpc.");
             return;
         }
 
@@ -36,23 +38,23 @@ public class DSGSocialMediaBenchmarkClient {
         String targetID = "002" + System.currentTimeMillis();
         client.createProfile(targetID, "Bob", "Mustermann", "test");
 
-        measureCreateProfile(client, args[0]);
-        measureGetProfile(client, userID, args[0]);
-        measureUpdateProfile(client, userID, args[0]);
-        measurePublishPost(client, userID, args[0]);
-        measureDeletePost(client, userID, args[0]);
+        measureCreateProfile(client, type);
+        measureGetProfile(client, userID, type);
+        measureUpdateProfile(client, userID, type);
+        measurePublishPost(client, userID, type);
+        measureDeletePost(client, userID, type);
 
         String getpostuserID = "003" + System.currentTimeMillis();
         client.createProfile(getpostuserID, "Celine", "Musterfrau", "For getposts");
         client.publishPost(getpostuserID, "For getposts");
-        measureGetPosts(client, getpostuserID, args[0]);
+        measureGetPosts(client, getpostuserID, type);
 
-        measureFollowStudent(client, userID, targetID, args[0]);
-        measureUnfollowStudent(client, userID, targetID, args[0]);
+        measureFollowStudent(client, userID, targetID, type);
+        measureUnfollowStudent(client, userID, targetID, type);
 
         client.followStudent(userID, targetID);
         client.publishPost(targetID, "For getfeed");
-        measureGetFeed(client, userID, args[0]);
+        measureGetFeed(client, userID, type);
 
         client.shutdown();
     }

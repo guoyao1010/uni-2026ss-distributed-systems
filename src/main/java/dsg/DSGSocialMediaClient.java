@@ -3,16 +3,12 @@ package dsg;
 import dsg.rmi.socialmedia.DSGShell;
 import java.util.List;
 
-import dsg.rmi.socialmedia.DSGSocialMediaPost;
 import dsg.rmi.socialmedia.DSGSocialMediaRMIClient;
 import dsg.grpc.SocialNetworkClient;
-
-import java.util.Scanner;
 
 public abstract class DSGSocialMediaClient extends DSGShell {
     public abstract void init (String host, int port) throws Exception;
     public abstract void shutdown ();
-
 
     protected abstract void createProfile (String userID, String firstname, String lastname, String bio) throws Exception;
     protected abstract String getProfile (String userID) throws Exception;
@@ -93,27 +89,24 @@ public abstract class DSGSocialMediaClient extends DSGShell {
 
     public static void main (String[] args) throws Exception {
         DSGSocialMediaClient client;
-        String type;
 
-        if (args.length > 0) {
-            type = args[0];
-        } else {
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Choose client type: rmi or grpc.");
-            System.out.print("> ");
-            type = scanner.nextLine();
+        if (args.length < 2) {
+            System.out.println("Please run the client again using commands with two parameters: <rmi|grpc> <hostname>");
+            return;
         }
+        String type = args[0];
+        String host = args[1];
 
         if (type.equals("rmi")) {
             client = new DSGSocialMediaRMIClient();
-            client.init("localhost", 1099);
+            client.init(host, 1099);
             System.out.println("You are using the RMI client.");
         } else if (type.equals("grpc")) {
             client = new SocialNetworkClient();
-            client.init("localhost", 8080);
+            client.init(host, 8080);
             System.out.println("You are using the gRPC client.");
         } else {
-            System.out.println("Please run this file again and choose the client type first: rmi or grpc.");
+            System.out.println("Please choose the client type in command: rmi or grpc.");
             return;
         }
 
