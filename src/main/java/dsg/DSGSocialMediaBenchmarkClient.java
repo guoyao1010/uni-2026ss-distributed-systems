@@ -42,7 +42,7 @@ public class DSGSocialMediaBenchmarkClient {
 
         measureGetProfile(client, userID, type);
         measureUpdateProfile(client, userID, type);
-        measureDeletePost(client, userID, type);
+        measureDeletePost(client, type);
         measureFollowStudent(client, userID, targetID, type);
         measureUnfollowStudent(client, userID, targetID, type);
 
@@ -167,24 +167,27 @@ public class DSGSocialMediaBenchmarkClient {
         System.out.println(framework +",updateProfile," + avgMs + "," + minMs +"," + maxMs);
     }
 
-    private static void measureDeletePost (DSGSocialMediaClient client, String userID, String framework) throws Exception {
+    private static void measureDeletePost (DSGSocialMediaClient client, String framework) throws Exception {
         long min = Long.MAX_VALUE;
         long max = 0;
         long total = 0;
 
+        String deletepostuserID = "deletepostuserID_" + System.currentTimeMillis();
+        client.createProfile(deletepostuserID, "firstname", "lastname", "For deletepost");
+
         for (int i = 0; i < WARMUP; i++){
-            client.publishPost(userID, "warmup_content");
-            List<String> userposts = client.getPosts(userID);
+            client.publishPost(deletepostuserID, "warmup_content");
+            List<String> userposts = client.getPosts(deletepostuserID);
             String postID = userposts.get(0).split(" ", 2)[0];
-            client.deletePost(userID, postID);
+            client.deletePost(deletepostuserID, postID);
         }
 
         for (int i= 0; i < RUNS; i++) {
-            client.publishPost(userID, "run_content");
-            List<String> userposts = client.getPosts(userID);
+            client.publishPost(deletepostuserID, "run_content");
+            List<String> userposts = client.getPosts(deletepostuserID);
             String postID = userposts.get(0).split(" ", 2)[0];
             long start = System.nanoTime();
-            client.deletePost(userID, postID);
+            client.deletePost(deletepostuserID, postID);
             long end = System.nanoTime();
             long time = end - start;
             total = total + time;
