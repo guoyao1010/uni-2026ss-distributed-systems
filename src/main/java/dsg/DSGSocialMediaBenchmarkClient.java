@@ -32,29 +32,32 @@ public class DSGSocialMediaBenchmarkClient {
             return;
         }
 
+        measureCreateProfile(client, type);
+
         String userID = "001" + System.currentTimeMillis();
         client.createProfile(userID, "Ada", "Musterfrau", "test");
 
         String targetID = "002" + System.currentTimeMillis();
         client.createProfile(targetID, "Bob", "Mustermann", "test");
 
-        measureCreateProfile(client, type);
         measureGetProfile(client, userID, type);
         measureUpdateProfile(client, userID, type);
-        measurePublishPost(client, userID, type);
         measureDeletePost(client, userID, type);
-
-        String getpostuserID = "003" + System.currentTimeMillis();
-        client.createProfile(getpostuserID, "Celine", "Musterfrau", "For getposts");
-        client.publishPost(getpostuserID, "For getposts");
-        measureGetPosts(client, getpostuserID, type);
-
         measureFollowStudent(client, userID, targetID, type);
         measureUnfollowStudent(client, userID, targetID, type);
 
         client.followStudent(userID, targetID);
         client.publishPost(targetID, "For getfeed");
         measureGetFeed(client, userID, type);
+
+        // Evaluate functions with increasing parameter and return value sizes
+        measurePublishPostWithPayload (client, type, 10);
+        measurePublishPostWithPayload (client, type, 100);
+        measurePublishPostWithPayload (client, type, 1000);
+
+        measureGetPostsWithPayload(client,type, 1);
+        measureGetPostsWithPayload(client,type, 10);
+        measureGetPostsWithPayload(client,type, 100);
 
         client.shutdown();
     }
@@ -164,37 +167,6 @@ public class DSGSocialMediaBenchmarkClient {
         System.out.println(framework +",updateProfile," + avgMs + "," + minMs +"," + maxMs);
     }
 
-    // PublishPost
-    private static void measurePublishPost(DSGSocialMediaClient client, String userID, String framework) throws Exception {
-        long min = Long.MAX_VALUE;
-        long max = 0;
-        long total = 0;
-
-        for (int i = 0; i < WARMUP; i++){
-            client.publishPost(userID, "warmup_content");
-        }
-
-        for (int i= 0; i < RUNS; i++) {
-            long start = System.nanoTime();
-            client.publishPost(userID, "run_content");
-            long end = System.nanoTime();
-            long time = end - start;
-            total = total + time;
-            if (time < min) {
-                min = time;
-            }
-            if (time > max) {
-                max = time;
-            }
-        }
-
-        double avgMs = total/(double) RUNS / 1000000.0;
-        double minMs = min/ 1000000.0;
-        double maxMs = max/1000000.0;
-
-        System.out.println(framework +",publishPost," + avgMs + "," + minMs +"," + maxMs);
-    }
-
     private static void measureDeletePost (DSGSocialMediaClient client, String userID, String framework) throws Exception {
         long min = Long.MAX_VALUE;
         long max = 0;
@@ -203,14 +175,14 @@ public class DSGSocialMediaBenchmarkClient {
         for (int i = 0; i < WARMUP; i++){
             client.publishPost(userID, "warmup_content");
             List<String> userposts = client.getPosts(userID);
-            String postID = userposts.get(0).split(" ")[0];
+            String postID = userposts.get(0).split(" ", 2)[0];
             client.deletePost(userID, postID);
         }
 
         for (int i= 0; i < RUNS; i++) {
             client.publishPost(userID, "run_content");
             List<String> userposts = client.getPosts(userID);
-            String postID = userposts.get(0).split(" ")[0];
+            String postID = userposts.get(0).split(" ", 2)[0];
             long start = System.nanoTime();
             client.deletePost(userID, postID);
             long end = System.nanoTime();
@@ -297,7 +269,7 @@ public class DSGSocialMediaBenchmarkClient {
         System.out.println(framework +",unfollowStudent," + avgMs + "," + minMs +"," + maxMs);
     }
 
-    // GetFeed: currently measured with 1 post.
+    // GetFeed: fixed payload, currently evaluated with 1 post
     private static void measureGetFeed(DSGSocialMediaClient client, String userID, String framework) throws Exception {
         long min = Long.MAX_VALUE;
         long max = 0;
@@ -328,18 +300,33 @@ public class DSGSocialMediaBenchmarkClient {
         System.out.println(framework +",getFeed," + avgMs + "," + minMs +"," + maxMs);
     }
 
-    private static void measureGetPosts(DSGSocialMediaClient client, String userID, String framework) throws Exception {
+    // Evaluate two methods with different payload: publishPost, getPosts
+    // For creating different length of post content (for publishpost)
+    private static String createContent (int contentlength) {
+        StringBuilder content = new StringBuilder();
+        for (int i = 0; i <contentlength; i++) {
+            content.append("c");
+        }
+        return content.toString();
+    }
+
+    // PublishPost
+    private static void measurePublishPostWithPayload(DSGSocialMediaClient client, String framework, int contentlength) throws Exception {
         long min = Long.MAX_VALUE;
         long max = 0;
         long total = 0;
 
+        String publishpostuserID = "publishpost_user_payload" + contentlength + System.currentTimeMillis();
+        client.createProfile(publishpostuserID, "firstname", "lastname", "publishpotwithpayload");
+        String content = createContent(contentlength);
+
         for (int i = 0; i < WARMUP; i++){
-            client.getPosts(userID);
+            client.publishPost(publishpostuserID, content);
         }
 
         for (int i= 0; i < RUNS; i++) {
             long start = System.nanoTime();
-            client.getPosts(userID);
+            client.publishPost(publishpostuserID, content);
             long end = System.nanoTime();
             long time = end - start;
             total = total + time;
@@ -355,6 +342,45 @@ public class DSGSocialMediaBenchmarkClient {
         double minMs = min/ 1000000.0;
         double maxMs = max/1000000.0;
 
-        System.out.println(framework +",getPosts," + avgMs + "," + minMs +"," + maxMs);
+        System.out.println(framework +",publishPost_" + contentlength + "_contentlength," + avgMs + "," + minMs +"," + maxMs);
     }
+
+    // GetPosts
+    private static void measureGetPostsWithPayload(DSGSocialMediaClient client, String framework, int postCounter) throws Exception {
+        long min = Long.MAX_VALUE;
+        long max = 0;
+        long total = 0;
+
+        String getpostsuserID = "getposts_user_payload_" + postCounter + System.currentTimeMillis();
+        client.createProfile(getpostsuserID, "firstname", "lastname", "getpostswithpayload");
+
+        for (int i = 0; i < postCounter; i++) {
+            client.publishPost(getpostsuserID, "getpostscontent"+i);
+        }
+
+        for (int i = 0; i < WARMUP; i++){
+            client.getPosts(getpostsuserID);
+        }
+
+        for (int i= 0; i < RUNS; i++) {
+            long start = System.nanoTime();
+            client.getPosts(getpostsuserID);
+            long end = System.nanoTime();
+            long time = end - start;
+            total = total + time;
+            if (time < min) {
+                min = time;
+            }
+            if (time > max) {
+                max = time;
+            }
+        }
+
+        double avgMs = total/(double) RUNS / 1000000.0;
+        double minMs = min/ 1000000.0;
+        double maxMs = max/1000000.0;
+
+        System.out.println(framework +",getPosts_" + postCounter + "_posts," + avgMs + "," + minMs +"," + maxMs);
+    }
+
 }
