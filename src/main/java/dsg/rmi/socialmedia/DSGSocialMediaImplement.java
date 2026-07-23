@@ -12,7 +12,7 @@ import java.util.Set;
 public class DSGSocialMediaImplement implements DSGSocialMedia {
 
     private final Map<String, DSGSocialMediaUser> profiles = new HashMap<>();
-    private final Map<String, DSGSocialMediaPost> posts = new HashMap<>();
+    private final Map<String, List<DSGSocialMediaPost>> userPosts = new HashMap<>();
     private final Map<String, Set<String>> following = new HashMap<>();
 	private int postCounter = 0;
 
@@ -26,6 +26,7 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
         if (!profiles.containsKey (userID)) {
             DSGSocialMediaUser newProfile = new DSGSocialMediaUser (userID, firstname, lastname, bio);
             profiles.put (userID, newProfile);
+            userPosts.put(userID, new ArrayList<>());
             following.put(userID, new HashSet<>());
         }
     }
@@ -33,11 +34,8 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
     // Method updateProfile by Osama
     @Override
     public synchronized void updateProfile(String userID, String firstname, String lastname, String bio) throws RemoteException {
-        DSGSocialMediaUser profile = profiles.get(userID);
-        if (profile != null) {
-            profile.firstname = firstname;
-            profile.lastname = lastname;
-            profile.bio = bio;
+        if (profiles.containsKey(userID)) {
+            profiles.put(userID, new DSGSocialMediaUser(userID, firstname, lastname, bio));
         }
     }
 
@@ -55,22 +53,28 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
             postCounter ++;
             DSGSocialMediaPost newPost= new DSGSocialMediaPost(userID, content);
             newPost.postID = String.valueOf(postCounter);
-            posts.put(newPost.postID, newPost);
+            userPosts.get(userID).add(newPost);
         }
     }
 
     // Method deletePost by Yao
     @Override
     public synchronized void deletePost (String userID, String postID) throws RemoteException {
-        if (!posts.containsKey(postID)) {
+        List<DSGSocialMediaPost> postsOfUser = userPosts.get(userID);
+        if (postsOfUser == null) {
+            throw new RemoteException("This user does not exist: " + userID);
+        }
+        DSGSocialMediaPost postToDelete = null;
+        for (DSGSocialMediaPost post: postsOfUser) {
+            if (post.postID.equals(postID)) {
+                postToDelete = post;
+                break;
+            }
+        }
+        if (postToDelete == null) {
             throw new RemoteException("This post does not exist.");
         }
-
-        DSGSocialMediaPost post = posts.get(postID);
-        if (!post.userID.equals(userID)) {
-            throw new RemoteException("You can only delete your own post.");
-        }
-        posts.remove(postID);
+        postsOfUser.remove(postToDelete);
     }
 
     // Method followStudent by Yao
@@ -85,7 +89,6 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
         if (followerID.equals(targetID)) {
             throw new RemoteException("Sorry, you cannot follow yourself.");
         }
-        following.putIfAbsent(followerID, new HashSet<>());
         Set<String> followedStudents = following.get(followerID);
         followedStudents.add(targetID);
     }
@@ -116,17 +119,13 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
     @Override
     public synchronized List<DSGSocialMediaPost> getFeed (String userID) throws RemoteException {
         if (!profiles.containsKey(userID)) {
-            throw new RemoteException("User does not exist: " + userID);
+            throw new RemoteException("This user does not exist: " + userID);
         }
         List<DSGSocialMediaPost> feed = new ArrayList<>();
         Set<String> followedStudents = following.get(userID);
-        if (followedStudents == null) {
-            return feed;
-        }
-        for (DSGSocialMediaPost post : posts.values()) {
-            if (followedStudents.contains(post.userID)) {
-                feed.add(post);
-            }
+
+        for (String followedUserID: followedStudents) {
+            feed.addAll(userPosts.get(followedUserID));
         }
         feed.sort((post1, post2) -> Integer.compare(Integer.parseInt(post2.postID), Integer.parseInt(post1.postID)));
         return feed;
@@ -136,15 +135,10 @@ public class DSGSocialMediaImplement implements DSGSocialMedia {
     @Override
     public synchronized List<DSGSocialMediaPost> getPosts (String userID) throws RemoteException {
         if (!profiles.containsKey(userID)) {
-            throw new RemoteException("User does not exist.");
+            throw new RemoteException("This user does not exist.");
         }
-        List<DSGSocialMediaPost> userPosts = new ArrayList<>();
-        for (DSGSocialMediaPost post : posts.values()) {
-            if (post.userID.equals(userID)) {
-                userPosts.add(post);
-            }
-        }
-        userPosts.sort((post1, post2) -> Integer.compare(Integer.parseInt(post2.postID), Integer.parseInt(post1.postID)));
-        return userPosts;
+        List<DSGSocialMediaPost> postsResult = new ArrayList<>(userPosts.get(userID));
+        postsResult.sort((post1, post2) -> Integer.compare(Integer.parseInt(post2.postID), Integer.parseInt(post1.postID)));
+        return postsResult;
     }
 }

@@ -2,16 +2,18 @@ package dsg.grpc;
 
 import io.grpc.stub.StreamObserver;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNetworkServiceImplBase {
 
-    private final Map<String, ProfileData> profiles = new ConcurrentHashMap<>();
-    private final Map<String, List<Post>> userPosts = new ConcurrentHashMap<>();
-    private final Map<String, Set<String>> following = new ConcurrentHashMap<>();
-    private final AtomicInteger postIdCounter = new AtomicInteger(1);
+    /*
+    Change to standard collection and a regular int instead of concurrent collection and AtomicInteger.
+    Purpose: to keep the server-side implementations of RMI and gRPC consistent for a fair benchmark. Otherwise, the benchmark will also measure the overhead of concurrent data structure rather than the primary gRPC framework.
+    Thread safety is instead ensured by synchronizing each method so that only one thread executes a method at a time.
+     */
+    private final Map<String, ProfileData> profiles = new HashMap<>();
+    private final Map<String, List<Post>> userPosts = new HashMap<>();
+    private final Map<String, Set<String>> following = new HashMap<>();
+    private int postIdCounter = 0;
 
     private static class ProfileData {
         String firstname;
@@ -21,23 +23,22 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
     }
 
     @Override
-    public void createProfile(CreateProfileRequest request, StreamObserver<EmptyResponse> responseObserver) {
+    public synchronized void createProfile(CreateProfileRequest request, StreamObserver<EmptyResponse> responseObserver) {
         if (!profiles.containsKey(request.getUserId())) {
             profiles.put(request.getUserId(), new ProfileData(
                     request.getFirstname(),
                     request.getLastname(),
                     request.getBio()
             ));
+            userPosts.putIfAbsent(request.getUserId(), new ArrayList<>());
+            following.putIfAbsent(request.getUserId(), new HashSet<>());
         }
-        userPosts.putIfAbsent(request.getUserId(), new CopyOnWriteArrayList<>());
-        following.putIfAbsent(request.getUserId(), ConcurrentHashMap.newKeySet());
-
         responseObserver.onNext(EmptyResponse.newBuilder().build());
         responseObserver.onCompleted();
     }
 
     @Override
-    public void updateProfile(UpdateProfileRequest request, StreamObserver<EmptyResponse> responseObserver) {
+    public synchronized void updateProfile(UpdateProfileRequest request, StreamObserver<EmptyResponse> responseObserver) {
         if (profiles.containsKey(request.getUserId())) {
             profiles.put(request.getUserId(), new ProfileData(request.getFirstname(),request.getLastname(), request.getBio()));
         }
@@ -46,7 +47,7 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
     }
 
     @Override
-    public void getProfile(GetProfileRequest request, StreamObserver<GetProfileResponse> responseObserver) {
+    public synchronized void getProfile(GetProfileRequest request, StreamObserver<GetProfileResponse> responseObserver) {
         ProfileData p = profiles.get(request.getUserId());
         GetProfileResponse.Builder response = GetProfileResponse.newBuilder();
         if (p != null) {
@@ -57,31 +58,41 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
     }
 
     @Override
-    public void publishPost(PublishPostRequest request, StreamObserver<EmptyResponse> responseObserver) {
+    public synchronized void publishPost(PublishPostRequest request, StreamObserver<EmptyResponse> responseObserver) {
         List<Post> posts = userPosts.get(request.getUserId());
         if (posts != null) {
+            postIdCounter++;
             Post newPost = Post.newBuilder()
-                    .setPostId(String.valueOf(postIdCounter.getAndIncrement()))
+                    .setPostId(String.valueOf(postIdCounter))
                     .setContent(request.getContent())
                     .build();
-            posts.add(0, newPost);
+            posts.add(newPost);
         }
         responseObserver.onNext(EmptyResponse.newBuilder().build());
         responseObserver.onCompleted();
     }
 
     @Override
-    public void deletePost(DeletePostRequest request, StreamObserver<EmptyResponse> responseObserver) {
+    public synchronized void deletePost(DeletePostRequest request, StreamObserver<EmptyResponse> responseObserver) {
         List<Post> posts = userPosts.get(request.getUserId());
         if (posts != null) {
-            posts.removeIf(post -> String.valueOf(post.getPostId()).equals(request.getPostId()));
+            Post postToDelete = null;
+            for (Post post: posts) {
+                if (post.getPostId().equals(request.getPostId())) {
+                    postToDelete = post;
+                    break;
+                }
+            }
+            if (postToDelete != null) {
+                posts.remove(postToDelete);
+            }
         }
         responseObserver.onNext(EmptyResponse.newBuilder().build());
         responseObserver.onCompleted();
     }
 
     @Override
-    public void followStudent(FollowStudentRequest request, StreamObserver<EmptyResponse> responseObserver) {
+    public synchronized void followStudent(FollowStudentRequest request, StreamObserver<EmptyResponse> responseObserver) {
         Set<String> f = following.get(request.getFollowerId());
         if (f != null && profiles.containsKey(request.getTargetId()) && !request.getFollowerId().equals(request.getTargetId())) {
             f.add(request.getTargetId());
@@ -91,7 +102,7 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
     }
 
     @Override
-    public void unfollowStudent(UnfollowStudentRequest request, StreamObserver<EmptyResponse> responseObserver) {
+    public synchronized void unfollowStudent(UnfollowStudentRequest request, StreamObserver<EmptyResponse> responseObserver) {
         if (profiles.containsKey(request.getFollowerId()) && profiles.containsKey(request.getTargetId())) {
             Set<String> f = following.get(request.getFollowerId());
             if (f != null && f.contains(request.getTargetId())) {
@@ -103,7 +114,7 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
     }
 
     @Override
-    public void getFeed(GetFeedRequest request, StreamObserver<GetFeedResponse> responseObserver) {
+    public synchronized void getFeed(GetFeedRequest request, StreamObserver<GetFeedResponse> responseObserver) {
         GetFeedResponse.Builder response = GetFeedResponse.newBuilder();
         Set<String> followedUsers = following.get(request.getUserId());
 
@@ -124,13 +135,13 @@ public class SocialNetworkServiceImpl extends SocialNetworkServiceGrpc.SocialNet
     }
 
     @Override
-    public void getPosts (GetPostsRequest request, StreamObserver<GetPostsResponse> responseObserver) {
+    public synchronized void getPosts (GetPostsRequest request, StreamObserver<GetPostsResponse> responseObserver) {
         GetPostsResponse.Builder response = GetPostsResponse.newBuilder();
         List<Post> posts = userPosts.get(request.getUserId());
         if (posts != null) {
-            List<Post> postsresult = new ArrayList<>(posts);
-            postsresult.sort((post1, post2) -> Integer.compare(Integer.parseInt(post2.getPostId()), Integer.parseInt(post1.getPostId())));
-            response.addAllPosts(postsresult);
+            List<Post> postsResult = new ArrayList<>(posts);
+            postsResult.sort((post1, post2) -> Integer.compare(Integer.parseInt(post2.getPostId()), Integer.parseInt(post1.getPostId())));
+            response.addAllPosts(postsResult);
         }
         responseObserver.onNext(response.build());
         responseObserver.onCompleted();
