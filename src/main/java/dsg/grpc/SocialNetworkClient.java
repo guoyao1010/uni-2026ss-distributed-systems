@@ -1,12 +1,12 @@
 package dsg.grpc;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import dsg.DSGSocialMediaClient;
+import dsg.grpc.SocialNetworkServiceGrpc.SocialNetworkServiceBlockingStub;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import dsg.grpc.SocialNetworkServiceGrpc.SocialNetworkServiceBlockingStub;
-import dsg.grpc.SocialNetworkProto.*;
-import dsg.DSGSocialMediaClient;
-import java.util.List;
-import java.util.ArrayList;
 
 public class SocialNetworkClient extends DSGSocialMediaClient {
 

@@ -1,18 +1,29 @@
-# Ignore Gradle project-specific cache directory
-.gradle
+# Gradle
+.gradle/
+build/
 
-# Ignore Gradle build output directory
-build
+# Kotlin plugin data
+.kotlin/
 
-# Ignore Kotlin plugin data
-.kotlin
-
-# Ignore JAVA binaries
+# Java binaries
 *.jar
 *.class
 
-# Ignore generated PDFs
+# Generated PDFs
 *.pdf
 
-# Ignore Intellij project files
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Local build/output directories
+bin/
+
+# Intellij project files
 .idea/
