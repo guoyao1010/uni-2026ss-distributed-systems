@@ -1,6 +1,6 @@
 # Distributed Social Media System with Java RMI and gRPC
 
-This project was developed by **Yao Guo** as part of a two-person team during the Summer Semester 2026 at the University of Bamberg. It was completed within the university project **DSG-Proj-B/M: Remote Procedure Calls** at the Chair of Distributed Systems (Lehrstuhl für Verteilte Systeme).
+This project was developed collaboratively by a team of two students during the Summer Semester 2026 at the University of Bamberg. It was completed within the university project **DSG-Proj-B/M: Remote Procedure Calls** at the Chair of Distributed Systems (Lehrstuhl für Verteilte Systeme).
 
 The project implements a small distributed social media system using two RPC technologies, **Java RMI** and **gRPC with Protocol Buffers**. Both implementations provide the same core social media functionality. The client and server were deployed on separate university virtual machines for functional testing and performance benchmarking.
 
@@ -8,10 +8,9 @@ The project implements a small distributed social media system using two RPC tec
 
 - **University:** University of Bamberg
 - **Chair:** Lehrstuhl für Verteilte Systeme
-- **Project:** DSG-Proj-B/M: Remote Procedure Calls
+- **Project:** Remote Procedure Calls
 - **Period:** Summer Semester 2026 (15 April – 15 July 2026)
-- **Supervision:** Prof. Dr.-Ing. habil. Tobias Distler and Harald Böhm
-- **Team (Group 7):** Yao Guo and Osama Abood Alsaho
+- **Team:** Group 7 (two students)
 - **Technologies:** Java, Java RMI, gRPC, Protocol Buffers, Gradle
 
 ## Project Scope
